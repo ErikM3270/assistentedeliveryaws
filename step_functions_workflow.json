@@ -1,0 +1,52 @@
+{
+  "Comment": "Assistente de Delivery com IA Generativa (Amazon Bedrock)",
+  "StartAt": "ValidarPedido",
+  "States": {
+    "ValidarPedido": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGIAO:SUA_CONTA:function:ValidarPedido",
+      "Next": "ChecarValidade"
+    },
+    "ChecarValidade": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "FALHA",
+          "Next": "PedidoCancelado"
+        }
+      ],
+      "Default": "ProcessarPagamento"
+    },
+    "ProcessarPagamento": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGIAO:SUA_CONTA:function:ProcessarPagamento",
+      "Next": "ChecarPagamento"
+    },
+    "ChecarPagamento": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status_pagamento",
+          "StringEquals": "APROVADO",
+          "Next": "GerarMensagemBedrock"
+        }
+      ],
+      "Default": "PedidoCancelado"
+    },
+    "GerarMensagemBedrock": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGIAO:SUA_CONTA:function:AssistenteBedrock",
+      "Next": "NotificarCliente"
+    },
+    "NotificarCliente": {
+      "Type": "Pass",
+      "Result": "Mensagem enviada com sucesso ao cliente!",
+      "End": true
+    },
+    "PedidoCancelado": {
+      "Type": "Fail",
+      "Cause": "Falha na validação ou no pagamento do pedido."
+    }
+  }
+}

@@ -15,7 +15,7 @@ Projeto prático do Bootcamp da DIO. O objetivo deste projeto é criar um fluxo 
 5. O fluxo é finalizado com sucesso.
 
 ## JSON  (Payload)
-`json
+json
 {
   "cliente": "João Silva",
   "pedido_id": "998877",

@@ -1,0 +1,34 @@
+import json
+import boto3
+
+def lambda_handler(event, context):
+    bedrock = boto3.client('bedrock-runtime')
+    cliente = event.get('cliente', 'Cliente')
+    
+    # Prompt para a IA
+    prompt = f"Human: Crie uma mensagem curta, amigável e empolgante (máximo de 2 frases) avisando o cliente {cliente} que o pedido de delivery dele acabou de sair para entrega. Use emojis. \n\nAssistant:"
+    
+    body = json.dumps({
+        "prompt": prompt,
+        "max_tokens_to_sample": 300,
+        "temperature": 0.7,
+    })
+
+    try:
+        # Utilizando o modelo Anthropic Claude (ajuste conforme o modelo que você tem acesso no Bedrock)
+        response = bedrock.invoke_model(
+            body=body,
+            modelId='anthropic.claude-v2',
+            accept='application/json',
+            contentType='application/json'
+        )
+        response_body = json.loads(response.get('body').read())
+        mensagem_gerada = response_body.get('completion')
+        
+        event['mensagem_personalizada'] = mensagem_gerada.strip()
+        event['status_delivery'] = "EM_ROTA"
+        
+        return event
+        
+    except Exception as e:
+        return {"erro": str(e)}

@@ -1,0 +1,15 @@
+import json
+
+def lambda_handler(event, context):
+    # Simula um gateway de pagamento
+    status_anterior = event.get('status')
+    
+    if status_anterior == "FALHA":
+        return event # Repassa o erro
+        
+    # Lógica fictícia de aprovação
+    return {
+        "status_pagamento": "APROVADO",
+        "cliente": event['cliente'],
+        "pedido_id": event['pedido_id']
+    }
